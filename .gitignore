@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python/
+env/
+venv/
+.venv/
+*.egg-info/
+.tox/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+.DS_Store
+.Trashes
+Thumbs.db
+ehthumbs.db
+*.stackdump
+*.log
+
+# Rexode specific
+.rexode/
+chat_history/
+downloads/
+generated_tools/
+*.env
+*.env.example
+subscription.json
+PyWhatKit_DB.txt

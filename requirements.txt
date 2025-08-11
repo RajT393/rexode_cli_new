@@ -1,0 +1,45 @@
+firebase-admin
+# === Core AI and LLMs ===
+langchain>=0.1.14
+langchain-community
+langchain-openai
+langchain-google-genai
+langchain-anthropic
+openai
+google-generativeai
+anthropic
+ollama
+chromadb
+
+# === Search & Web Tools ===
+playwright
+beautifulsoup4
+requests
+
+# === Speech & Audio ===
+pyaudio
+speechrecognition
+pyttsx3
+playsound
+
+# === Vision & OCR ===
+pytesseract
+opencv-python
+Pillow
+
+# === Input / Automation / Accessibility ===
+keyboard
+pyautogui
+pywhatkit
+pynput
+pyperclip
+pywin32
+
+# === Utility & System ===
+python-dotenv
+schedule
+colorama
+rich
+tqdm
+fuzzywuzzy
+python-Levenshtein # Required for fuzzywuzzy performance

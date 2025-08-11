@@ -1,0 +1,91 @@
+[
+  {
+    "name": "example_tool_1",
+    "description": "A brief description of what example_tool_1 does.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "param1": {
+          "type": "string",
+          "description": "Description of param1"
+        },
+        "param2": {
+          "type": "integer",
+          "description": "Description of param2"
+        }
+      },
+      "required": ["param1"]
+    },
+    "examples": [
+      {
+        "input": "Use example tool 1 with value A and 123",
+        "tool_call": {
+          "name": "example_tool_1",
+          "parameters": {
+            "param1": "value A",
+            "param2": 123
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "example_tool_2",
+    "description": "Another example tool.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "type": "string",
+          "description": "The search query"
+        }
+      },
+      "required": ["query"]
+    },
+    "examples": [
+      {
+        "input": "Search for 'AI assistant'",
+        "tool_call": {
+          "name": "example_tool_2",
+          "parameters": {
+            "query": "AI assistant"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "say_hello",
+    "description": "Says hello to a given name.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name to say hello to."
+        }
+      },
+      "required": ["name"]
+    },
+    "examples": [
+      {
+        "input": "Say hello to John",
+        "tool_call": {
+          "name": "say_hello",
+          "parameters": {
+            "name": "John"
+          }
+        }
+      },
+      {
+        "input": "Greet Mary",
+        "tool_call": {
+          "name": "say_hello",
+          "parameters": {
+            "name": "Mary"
+          }
+        }
+      }
+    ]
+  }
+]
