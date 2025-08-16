@@ -22,6 +22,25 @@
         ]
       },
       {
+        "name": "launch_app",
+        "description": "Launches an application by name on Windows, macOS, or Linux. On Windows, it simulates pressing the Win key, typing the app name, and pressing Enter. On macOS, it uses 'open -a <app_name>'. On Linux, it uses 'xdg-open' or attempts direct execution.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_name": {
+              "type": "string",
+              "description": "The name of the application to launch (e.g., 'notepad', 'Google Chrome', 'firefox')."
+            }
+          },
+          "required": ["app_name"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Launch Notepad", "tool_call": {"name": "launch_app", "parameters": {"app_name": "notepad"}}},
+          {"input": "Open Firefox", "tool_call": {"name": "launch_app", "parameters": {"app_name": "firefox"}}}
+        ]
+      },
+      {
         "name": "list_files",
         "description": "Lists all files and directories in a given path.",
         "parameters": {

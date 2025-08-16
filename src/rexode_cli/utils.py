@@ -45,3 +45,10 @@ def notify_user(message: str):
     else:
         # fallback for mac/linux
         print(f"🔔 {message}")
+
+import pyttsx3
+
+def speak_text(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()

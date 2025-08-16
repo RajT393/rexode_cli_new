@@ -157,9 +157,9 @@ class TaskOrchestrator:
                 try:
                     tool_call = json.loads(response.content)
                 except json.JSONDecodeError:
-                    log_action(f"LLM returned invalid JSON: {response.content}")
-                    self.console.print(f"[red]x LLM returned invalid response. Please try rephrasing your request.[/red]")
-                    return "Error: LLM returned an unparseable response."
+                    log_action(f"LLM returned non-JSON response: {response.content}")
+                    self.console.print(f"[green]V Rexode response: {response.content}[/green]")
+                    return response.content # Treat as direct response
 
                 if "tool_calls" in tool_call:
                     for tc in tool_call["tool_calls"]:

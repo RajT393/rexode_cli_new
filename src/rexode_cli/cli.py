@@ -73,7 +73,15 @@ class CLI:
             self.llm = self.llm_handler.initialize_llm(llm_type="local", model_name=self.model_name)
         elif selected_mode == "2":
             self.console.print("Online LLM mode selected.", style="bold green")
-            provider = self.console.input("[bold green]Enter online LLM provider (e.g., openai, google, anthropic): [/bold green]").strip().lower()
+            valid_providers = ["openai", "google", "anthropic"]
+            while True:
+                provider = self.console.input("[bold green]Enter online LLM provider (e.g., openai, google, anthropic): [/bold green]").strip().lower()
+                if provider in valid_providers:
+                    break
+                else:
+                    self.console.print(f"⚠️ '{provider}' is not a supported provider.", style="bold yellow")
+                    if "gemini" in provider:
+                        self.console.print(" Hint: use 'google' as provider and 'gemini-2.5-flash' as model.", style="dim")
             self.model_name = self.console.input("[bold green]Enter model name (e.g., gpt-4, gemini-1.5-pro): [/bold green]").strip()
             self.llm = self.llm_handler.initialize_llm(llm_type="online", provider=provider, model_name=self.model_name)
         elif selected_mode == "3":
