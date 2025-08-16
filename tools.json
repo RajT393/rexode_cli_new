@@ -1,90 +1,1932 @@
 [
   {
-    "name": "example_tool_1",
-    "description": "A brief description of what example_tool_1 does.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "param1": {
-          "type": "string",
-          "description": "Description of param1"
+    "category": "OS & File Management",
+    "tools": [
+      {
+        "name": "open_application",
+        "description": "Opens an application on the user's operating system. On Windows, it tries to open by name or path. On macOS, it uses 'open -a'. On Linux, it uses 'xdg-open'.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "application_name": {
+              "type": "string",
+              "description": "The name or path of the application to open (e.g., 'notepad.exe', 'Google Chrome', '/Applications/Safari.app')."
+            }
+          },
+          "required": ["application_name"]
         },
-        "param2": {
-          "type": "integer",
-          "description": "Description of param2"
-        }
+        "sensitive": true,
+        "examples": [
+          {"input": "Open Notepad", "tool_call": {"name": "open_application", "parameters": {"application_name": "notepad.exe"}}},
+          {"input": "Launch Google Chrome", "tool_call": {"name": "open_application", "parameters": {"application_name": "Google Chrome"}}}
+        ]
       },
-      "required": ["param1"]
-    },
-    "examples": [
       {
-        "input": "Use example tool 1 with value A and 123",
-        "tool_call": {
-          "name": "example_tool_1",
-          "parameters": {
-            "param1": "value A",
-            "param2": 123
-          }
-        }
+        "name": "list_files",
+        "description": "Lists all files and directories in a given path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "description": "The path of the directory to list (e.g., 'C:\\Users\\YourUser\\Documents', '/home/user/')."
+            }
+          },
+          "required": ["path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "List files in my Documents folder", "tool_call": {"name": "list_files", "parameters": {"path": "C:\\Users\\YourUser\\Documents"}}},
+          {"input": "Show contents of /var/log", "tool_call": {"name": "list_files", "parameters": {"path": "/var/log"}}}
+        ]
+      },
+      {
+        "name": "read_file",
+        "description": "Reads the content of a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The path of the file to read (e.g., 'C:\\Users\\YourUser\\file.txt', '/etc/fstab')."
+            }
+          },
+          "required": ["file_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Read the content of my_document.txt", "tool_call": {"name": "read_file", "parameters": {"file_path": "my_document.txt"}}},
+          {"input": "Show me /etc/hosts", "tool_call": {"name": "read_file", "parameters": {"file_path": "/etc/hosts"}}}
+        ]
+      },
+      {
+        "name": "write_file",
+        "description": "Writes content to a file. Creates the file if it doesn't exist, overwrites if it does.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The path of the file to write to (e.g., 'new_file.txt', '/tmp/data.log')."
+            },
+            "content": {
+              "type": "string",
+              "description": "The content to write to the file."
+            }
+          },
+          "required": ["file_path", "content"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Create a file named 'notes.txt' with content 'Meeting notes: Project Alpha'", "tool_call": {"name": "write_file", "parameters": {"file_path": "notes.txt", "content": "Meeting notes: Project Alpha"}}},
+          {"input": "Write 'Hello World' to output.txt", "tool_call": {"name": "write_file", "parameters": {"file_path": "output.txt", "content": "Hello World"}}}
+        ]
+      },
+      {
+        "name": "delete_file",
+        "description": "Deletes a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The path of the file to delete (e.g., 'old_report.pdf', '/tmp/temp_file')."
+            }
+          },
+          "required": ["file_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Delete the file 'temp.log'", "tool_call": {"name": "delete_file", "parameters": {"file_path": "temp.log"}}},
+          {"input": "Remove /home/user/junk.txt", "tool_call": {"name": "delete_file", "parameters": {"file_path": "/home/user/junk.txt"}}}
+        ]
+      },
+      {
+        "name": "move_file",
+        "description": "Moves a file from a source path to a destination path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source_path": {
+              "type": "string",
+              "description": "The current path of the file (e.g., 'document.docx')."
+            },
+            "destination_path": {
+              "type": "string",
+              "description": "The new path for the file (e.g., 'archive/document.docx')."
+            }
+          },
+          "required": ["source_path", "destination_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Move report.pdf to the 'reports' directory", "tool_call": {"name": "move_file", "parameters": {"source_path": "report.pdf", "destination_path": "reports/report.pdf"}}},
+          {"input": "Relocate image.jpg to /home/user/pictures", "tool_call": {"name": "move_file", "parameters": {"source_path": "image.jpg", "destination_path": "/home/user/pictures/image.jpg"}}}
+        ]
+      },
+      {
+        "name": "compress_files",
+        "description": "Compresses files into a zip archive.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "A list of paths of the files to compress (e.g., ['file1.txt', 'file2.pdf'])."
+            },
+            "archive_path": {
+              "type": "string",
+              "description": "The path of the zip archive to create (e.g., 'my_archive.zip')."
+            }
+          },
+          "required": ["file_paths", "archive_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Compress document.txt and image.png into 'backup.zip'", "tool_call": {"name": "compress_files", "parameters": {"file_paths": ["document.txt", "image.png"], "archive_path": "backup.zip"}}}
+        ]
+      },
+      {
+        "name": "extract_archive",
+        "description": "Extracts files from a zip archive.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "archive_path": {
+              "type": "string",
+              "description": "The path of the zip archive to extract (e.g., 'downloaded.zip')."
+            },
+            "extract_path": {
+              "type": "string",
+              "description": "The path to extract the files to (e.g., 'extracted_data/')."
+            }
+          },
+          "required": ["archive_path", "extract_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Extract 'data.zip' to the 'temp' folder", "tool_call": {"name": "extract_archive", "parameters": {"archive_path": "data.zip", "extract_path": "temp/"}}}
+        ]
+      },
+      {
+        "name": "system_info",
+        "description": "Gets information about the user's system (OS, release, version, machine, processor).",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "What is my system information?", "tool_call": {"name": "system_info", "parameters": {}}},
+          {"input": "Tell me about this computer", "tool_call": {"name": "system_info", "parameters": {}}}
+        ]
+      },
+      {
+        "name": "execute_shell_command",
+        "description": "Executes a shell command and returns its stdout, stderr, and return code.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "command": {
+              "type": "string",
+              "description": "The shell command to execute (e.g., 'ls -l', 'dir', 'ping google.com')."
+            }
+          },
+          "required": ["command"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Run 'ls -la'", "tool_call": {"name": "execute_shell_command", "parameters": {"command": "ls -la"}}},
+          {"input": "Execute 'ipconfig'", "tool_call": {"name": "execute_shell_command", "parameters": {"command": "ipconfig"}}}
+        ]
       }
     ]
   },
   {
-    "name": "example_tool_2",
-    "description": "Another example tool.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "query": {
-          "type": "string",
-          "description": "The search query"
-        }
-      },
-      "required": ["query"]
-    },
-    "examples": [
+    "category": "Web & Data Access",
+    "tools": [
       {
-        "input": "Search for 'AI assistant'",
-        "tool_call": {
-          "name": "example_tool_2",
-          "parameters": {
-            "query": "AI assistant"
-          }
-        }
+        "name": "search_web",
+        "description": "Searches the web for a given query and returns a list of search results (title, link).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query to search for (e.g., 'latest AI news', 'Python tutorial')."
+            }
+          },
+          "required": ["query"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Search for 'Gemini 1.5 Flash capabilities'", "tool_call": {"name": "search_web", "parameters": {"query": "Gemini 1.5 Flash capabilities"}}},
+          {"input": "Find information about quantum computing", "tool_call": {"name": "search_web", "parameters": {"query": "quantum computing"}}}
+        ]
+      },
+      {
+        "name": "scrape_website",
+        "description": "Scrapes the plain text content of a website from a given URL.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL of the website to scrape (e.g., 'https://example.com/article')."
+            }
+          },
+          "required": ["url"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Scrape the content of https://www.python.org", "tool_call": {"name": "scrape_website", "parameters": {"url": "https://www.python.org"}}},
+          {"input": "Get text from this page: https://en.wikipedia.org/wiki/Artificial_intelligence", "tool_call": {"name": "scrape_website", "parameters": {"url": "https://en.wikipedia.org/wiki/Artificial_intelligence"}}}
+        ]
+      },
+      {
+        "name": "download_file",
+        "description": "Downloads a file from a URL and saves it to a specified path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "description": "The URL of the file to download (e.g., 'https://example.com/image.jpg')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "The local path to save the downloaded file (e.g., 'downloads/image.jpg')."
+            }
+          },
+          "required": ["url", "save_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Download the image from https://example.com/pic.png to my_pics/pic.png", "tool_call": {"name": "download_file", "parameters": {"url": "https://example.com/pic.png", "save_path": "my_pics/pic.png"}}}
+        ]
+      },
+      {
+        "name": "get_weather",
+        "description": "Gets the current weather for a given location.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "location": {
+              "type": "string",
+              "description": "The location to get the weather for (e.g., 'London', 'New York City')."
+            }
+          },
+          "required": ["location"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "What's the weather in Paris?", "tool_call": {"name": "get_weather", "parameters": {"location": "Paris"}}},
+          {"input": "Current temperature in Tokyo", "tool_call": {"name": "get_weather", "parameters": {"location": "Tokyo"}}}
+        ]
+      },
+      {
+        "name": "get_news",
+        "description": "Gets the latest news for a given topic.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "The topic to get news for (e.g., 'technology', 'sports')."
+            }
+          },
+          "required": ["topic"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Get news about AI", "tool_call": {"name": "get_news", "parameters": {"topic": "AI"}}},
+          {"input": "Latest headlines on climate change", "tool_call": {"name": "get_news", "parameters": {"topic": "climate change"}}}
+        ]
+      },
+      {
+        "name": "fetch_api_data",
+        "description": "Fetches data from a specified API URL.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "api_url": {
+              "type": "string",
+              "description": "The URL of the API to fetch data from (e.g., 'https://api.github.com/users/octocat')."
+            }
+          },
+          "required": ["api_url"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Fetch data from the GitHub API for user 'octocat'", "tool_call": {"name": "fetch_api_data", "parameters": {"api_url": "https://api.github.com/users/octocat"}}}
+        ]
       }
     ]
   },
   {
-    "name": "say_hello",
-    "description": "Says hello to a given name.",
-    "parameters": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "The name to say hello to."
-        }
-      },
-      "required": ["name"]
-    },
-    "examples": [
+    "category": "Communication & Productivity",
+    "tools": [
       {
-        "input": "Say hello to John",
-        "tool_call": {
-          "name": "say_hello",
-          "parameters": {
-            "name": "John"
-          }
-        }
+        "name": "send_message",
+        "description": "Sends a message to a specified recipient. (Placeholder: requires integration with messaging service).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "recipient": {
+              "type": "string",
+              "description": "The recipient of the message (e.g., 'John Doe', 'email@example.com')."
+            },
+            "message": {
+              "type": "string",
+              "description": "The content of the message to send."
+            }
+          },
+          "required": ["recipient", "message"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Send a message to Jane saying 'Meeting at 3 PM'", "tool_call": {"name": "send_message", "parameters": {"recipient": "Jane", "message": "Meeting at 3 PM"}}}
+        ]
       },
       {
-        "input": "Greet Mary",
-        "tool_call": {
-          "name": "say_hello",
-          "parameters": {
-            "name": "Mary"
-          }
-        }
+        "name": "schedule_task",
+        "description": "Schedules a task at a specific time. (Placeholder: requires robust scheduling library).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task": {
+              "type": "string",
+              "description": "The description of the task to schedule (e.g., 'Call client X')."
+            },
+            "time": {
+              "type": "string",
+              "description": "The time to schedule the task (e.g., 'tomorrow 9 AM', '2025-08-15 14:00')."
+            }
+          },
+          "required": ["task", "time"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Schedule a reminder to buy groceries at 6 PM", "tool_call": {"name": "schedule_task", "parameters": {"task": "buy groceries", "time": "6 PM"}}}
+        ]
+      },
+      {
+        "name": "calendar_event",
+        "description": "Creates a calendar event. (Placeholder: requires integration with calendar API).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "The title of the event (e.g., 'Team Sync')."
+            },
+            "start_time": {
+              "type": "string",
+              "description": "The start time of the event (e.g., '2025-08-15 10:00')."
+            },
+            "end_time": {
+              "type": "string",
+              "description": "The end time of the event (e.g., '2025-08-15 11:00')."
+            }
+          },
+          "required": ["title", "start_time", "end_time"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Create a calendar event for 'Project Review' tomorrow from 9 AM to 10 AM", "tool_call": {"name": "calendar_event", "parameters": {"title": "Project Review", "start_time": "2025-08-12 09:00", "end_time": "2025-08-12 10:00"}}}
+        ]
+      },
+      {
+        "name": "clipboard_copy",
+        "description": "Copies text to the clipboard.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to copy to the clipboard."
+            }
+          },
+          "required": ["text"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Copy 'Hello Clipboard!' to clipboard", "tool_call": {"name": "clipboard_copy", "parameters": {"text": "Hello Clipboard!"}}}
+        ]
+      },
+      {
+        "name": "clipboard_paste",
+        "description": "Pastes text from the clipboard.",
+        "parameters": {
+          "type": "object",
+          "properties": {}
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Paste content from clipboard", "tool_call": {"name": "clipboard_paste", "parameters": {}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Media & Interaction",
+    "tools": [
+      {
+        "name": "play_media",
+        "description": "Plays a media file from a given file path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "file_path": {
+              "type": "string",
+              "description": "The path of the media file to play (e.g., 'music/song.mp3', 'video.mp4')."
+            }
+          },
+          "required": ["file_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Play the song 'my_favorite_song.mp3'", "tool_call": {"name": "play_media", "parameters": {"file_path": "my_favorite_song.mp3"}}}
+        ]
+      },
+      {
+        "name": "capture_screenshot",
+        "description": "Captures a screenshot of the entire screen and saves it to a specified path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "save_path": {
+              "type": "string",
+              "description": "The path to save the screenshot (e.g., 'screenshots/screenshot.png')."
+            }
+          },
+          "required": ["save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Take a screenshot and save it as 'desktop.png'", "tool_call": {"name": "capture_screenshot", "parameters": {"save_path": "desktop.png"}}}
+        ]
+      },
+      {
+        "name": "record_audio",
+        "description": "Records audio from the microphone for a specified duration and saves it to a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "type": "integer",
+              "description": "The duration to record audio in seconds."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "The path to save the audio recording (e.g., 'audio/recording.wav')."
+            }
+          },
+          "required": ["duration", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Record 10 seconds of audio and save it as 'voice_memo.wav'", "tool_call": {"name": "record_audio", "parameters": {"duration": 10, "save_path": "voice_memo.wav"}}}
+        ]
+      },
+      {
+        "name": "record_video",
+        "description": "Records video from the camera for a specified duration and saves it to a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "duration": {
+              "type": "integer",
+              "description": "The duration to record video in seconds."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "The path to save the video recording (e.g., 'video/my_clip.avi')."
+            }
+          },
+          "required": ["duration", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Record a 5-second video and save it as 'quick_clip.avi'", "tool_call": {"name": "record_video", "parameters": {"duration": 5, "save_path": "quick_clip.avi"}}}
+        ]
+      },
+      {
+        "name": "image_search",
+        "description": "Searches for images on the web based on a query. (Placeholder: requires integration with image search API).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "The query to search for images (e.g., 'cute cats', 'AI art')."
+            }
+          },
+          "required": ["query"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Search for images of 'golden retrievers'", "tool_call": {"name": "image_search", "parameters": {"query": "golden retrievers"}}}
+        ]
+      },
+      {
+        "name": "generate_image",
+        "description": "Generates an image from a text prompt. (Placeholder: requires integration with image generation API).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "The text prompt to generate an image from (e.g., 'a futuristic city at sunset')."
+            }
+          },
+          "required": ["prompt"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate an image of 'a robot painting a masterpiece'", "tool_call": {"name": "generate_image", "parameters": {"prompt": "a robot painting a masterpiece"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "AI & Data Processing",
+    "tools": [
+      {
+        "name": "summarize_text",
+        "description": "Summarizes a long text. (Placeholder: requires integration with an LLM).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to summarize."
+            }
+          },
+          "required": ["text"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Summarize this article: '...' ", "tool_call": {"name": "summarize_text", "parameters": {"text": "..."}}}
+        ]
+      },
+      {
+        "name": "translate_text",
+        "description": "Translates text from one language to another. (Placeholder: requires integration with translation API or LLM).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text to translate."
+            },
+            "target_language": {
+              "type": "string",
+              "description": "The language to translate the text to (e.g., 'French', 'Spanish')."
+            }
+          },
+          "required": ["text", "target_language"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Translate 'Hello' to Spanish", "tool_call": {"name": "translate_text", "parameters": {"text": "Hello", "target_language": "Spanish"}}}
+        ]
+      },
+      {
+        "name": "extract_text_from_image",
+        "description": "Extracts text from an image using OCR.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "image_path": {
+              "type": "string",
+              "description": "The path of the image to extract text from (e.g., 'invoice.png')."
+            }
+          },
+          "required": ["image_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Extract text from 'document.jpg'", "tool_call": {"name": "extract_text_from_image", "parameters": {"image_path": "document.jpg"}}}
+        ]
+      },
+      {
+        "name": "generate_code",
+        "description": "Generates code in a specified programming language based on a prompt. (Placeholder: requires integration with an LLM).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "The prompt to generate code from (e.g., 'Python function to sort a list')."
+            },
+            "language": {
+              "type": "string",
+              "description": "The programming language to generate code in (e.g., 'Python', 'JavaScript')."
+            }
+          },
+          "required": ["prompt", "language"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate Python code for a Fibonacci sequence", "tool_call": {"name": "generate_code", "parameters": {"prompt": "Fibonacci sequence", "language": "Python"}}}
+        ]
+      },
+      {
+        "name": "analyze_data",
+        "description": "Analyzes a dataset from a given path and provides insights. (Placeholder: requires data analysis library).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "data_path": {
+              "type": "string",
+              "description": "The path of the dataset to analyze (e.g., 'sales_data.csv')."
+            }
+          },
+          "required": ["data_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Analyze 'customer_data.xlsx'", "tool_call": {"name": "analyze_data", "parameters": {"data_path": "customer_data.xlsx"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Keyboard & Mouse Control",
+    "tools": [
+      {
+        "name": "mouse_move",
+        "description": "Moves the mouse cursor to a specified (x, y) coordinate on the screen.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "x": {
+              "type": "integer",
+              "description": "The x-coordinate (horizontal position) to move the mouse to."
+            },
+            "y": {
+              "type": "integer",
+              "description": "The y-coordinate (vertical position) to move the mouse to."
+            }
+          },
+          "required": ["x", "y"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Move mouse to 100, 200", "tool_call": {"name": "mouse_move", "parameters": {"x": 100, "y": 200}}}
+        ]
+      },
+      {
+        "name": "mouse_click",
+        "description": "Clicks a specified mouse button at the current cursor position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "button": {
+              "type": "string",
+              "enum": ["left", "right", "middle"],
+              "description": "The mouse button to click (e.g., 'left', 'right', 'middle')."
+            }
+          },
+          "required": ["button"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Perform a left mouse click", "tool_call": {"name": "mouse_click", "parameters": {"button": "left"}}}
+        ]
+      },
+      {
+        "name": "mouse_scroll",
+        "description": "Scrolls the mouse wheel up or down by a specified amount.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "scroll_amount": {
+              "type": "integer",
+              "description": "The amount to scroll the mouse wheel. Positive for up, negative for down."
+            }
+          },
+          "required": ["scroll_amount"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Scroll down by 10 units", "tool_call": {"name": "mouse_scroll", "parameters": {"scroll_amount": -10}}}
+        ]
+      },
+      {
+        "name": "keyboard_type",
+        "description": "Types a string of text using the keyboard.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "text": {
+              "type": "string",
+              "description": "The text string to type."
+            }
+          },
+          "required": ["text"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Type 'Hello World!'", "tool_call": {"name": "keyboard_type", "parameters": {"text": "Hello World!"}}}
+        ]
+      },
+      {
+        "name": "keyboard_press",
+        "description": "Presses a single key on the keyboard.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "The key to press (e.g., 'enter', 'esc', 'alt', 'ctrl', 'shift', 'f1')."
+            }
+          },
+          "required": ["key"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Press the Enter key", "tool_call": {"name": "keyboard_press", "parameters": {"key": "enter"}}}
+        ]
+      },
+      {
+        "name": "window_focus",
+        "description": "Focuses on an application window by its title.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "window_title": {
+              "type": "string",
+              "description": "The title or partial title of the window to focus on."
+            }
+          },
+          "required": ["window_title"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Focus on the 'Notepad' window", "tool_call": {"name": "window_focus", "parameters": {"window_title": "Notepad"}}}
+        ]
+      },
+      {
+        "name": "window_screenshot",
+        "description": "Takes a screenshot of a specific application window and saves it to a file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "window_title": {
+              "type": "string",
+              "description": "The title or partial title of the window to screenshot."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "The path to save the screenshot (e.g., 'screenshots/notepad_screenshot.png')."
+            }
+          },
+          "required": ["window_title", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Take a screenshot of the 'Calculator' window and save it as 'calc.png'", "tool_call": {"name": "window_screenshot", "parameters": {"window_title": "Calculator", "save_path": "calc.png"}}}
+        ]
+      },
+      {
+        "name": "drag_and_drop",
+        "description": "Drags an item from a source (x,y) position and drops it at a destination (x,y) position.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source_x": {
+              "type": "integer",
+              "description": "The x-coordinate of the starting position for the drag."
+            },
+            "source_y": {
+              "type": "integer",
+              "description": "The y-coordinate of the starting position for the drag."
+            },
+            "destination_x": {
+              "type": "integer",
+              "description": "The x-coordinate of the ending position for the drop."
+            },
+            "destination_y": {
+              "type": "integer",
+              "description": "The y-coordinate of the ending position for the drop."
+            }
+          },
+          "required": ["source_x", "source_y", "destination_x", "destination_y"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Drag from 10,10 to 200,200", "tool_call": {"name": "drag_and_drop", "parameters": {"source_x": 10, "source_y": 10, "destination_x": 200, "destination_y": 200}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Developer Power Tools",
+    "tools": [
+      {
+        "name": "git_clone",
+        "description": "Clones a Git repository from a URL to a specified local path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "repository_url": {
+              "type": "string",
+              "description": "The URL of the Git repository to clone (e.g., 'https://github.com/user/repo.git')."
+            },
+            "destination_path": {
+              "type": "string",
+              "description": "The local path to clone the repository into (e.g., 'my_projects/repo_name')."
+            }
+          },
+          "required": ["repository_url", "destination_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Clone https://github.com/octocat/Spoon-Knife to my_repos/spoon-knife", "tool_call": {"name": "git_clone", "parameters": {"repository_url": "https://github.com/octocat/Spoon-Knife.git", "destination_path": "my_repos/Spoon-Knife"}}}
+        ]
+      },
+      {
+        "name": "git_commit_push",
+        "description": "Commits all changes in a Git repository with a message and pushes them to the remote 'origin'.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "commit_message": {
+              "type": "string",
+              "description": "The commit message for the changes."
+            },
+            "repository_path": {
+              "type": "string",
+              "description": "The local path of the Git repository (e.g., 'my_project/')."
+            }
+          },
+          "required": ["commit_message", "repository_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Commit and push changes in current repo with message 'feat: add new feature'", "tool_call": {"name": "git_commit_push", "parameters": {"commit_message": "feat: add new feature", "repository_path": "."}}}
+        ]
+      },
+      {
+        "name": "git_pull",
+        "description": "Pulls the latest changes from the remote 'origin' of a Git repository.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "repository_path": {
+              "type": "string",
+              "description": "The local path of the Git repository (e.g., 'my_project/')."
+            }
+          },
+          "required": ["repository_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Pull latest changes for my_project", "tool_call": {"name": "git_pull", "parameters": {"repository_path": "my_project"}}}
+        ]
+      },
+      {
+        "name": "run_tests",
+        "description": "Runs tests for a project. Supports unit, integration, and regression tests. Defaults to pytest for Python projects.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "project_path": {
+              "type": "string",
+              "description": "The path of the project to run tests for."
+            },
+            "test_type": {
+              "type": "string",
+              "enum": ["unit", "integration", "regression", "all"],
+              "description": "Optional: Type of tests to run. Defaults to 'all'."
+            }
+          },
+          "required": ["project_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Run all tests in the 'my_app' directory", "tool_call": {"name": "run_tests", "parameters": {"project_path": "my_app", "test_type": "all"}}},
+          {"input": "Run unit tests for 'calculator_project'", "tool_call": {"name": "run_tests", "parameters": {"project_path": "calculator_project", "test_type": "unit"}}}
+        ]
+      },
+      {
+        "name": "build_project",
+        "description": "Builds a project using a specified build system (Maven, Gradle, npm, pip, Make, Unity, Unreal, Xcode) or attempts to auto-detect.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "project_path": {
+              "type": "string",
+              "description": "The path of the project to build."
+            },
+            "build_system": {
+              "type": "string",
+              "enum": ["maven", "gradle", "npm", "pip", "make", "unity", "unreal", "xcode", "auto"],
+              "description": "The build system to use. 'auto' attempts to detect."
+            }
+          },
+          "required": ["project_path", "build_system"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Build the 'web_app' project using npm", "tool_call": {"name": "build_project", "parameters": {"project_path": "web_app", "build_system": "npm"}}},
+          {"input": "Build the Java project at 'my_java_app'", "tool_call": {"name": "build_project", "parameters": {"project_path": "my_java_app", "build_system": "maven"}}}
+        ]
+      },
+      {
+        "name": "multi_platform_compile",
+        "description": "Compiles a project for multiple target platforms (Windows, macOS, Linux, Android, iOS).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "project_path": {
+              "type": "string",
+              "description": "The path to the project to compile."
+            },
+            "platforms": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of target platforms to compile for."
+            }
+          },
+          "required": ["project_path", "platforms"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Compile 'my_game' for Windows and macOS", "tool_call": {"name": "multi_platform_compile", "parameters": {"project_path": "my_game", "platforms": ["windows", "macos"]}}}
+        ]
+      },
+      {
+        "name": "ui_test_automation",
+        "description": "Automates UI tests by simulating mouse, keyboard, or touch interactions using a provided script.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "script_path": {
+              "type": "string",
+              "description": "Path to the UI automation script (e.g., 'ui_tests/login_test.py')."
+            },
+            "target_app": {
+              "type": "string",
+              "description": "Optional: Name or path of the application to test (e.g., 'Calculator', 'my_app.exe')."
+            }
+          },
+          "required": ["script_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Run UI test script 'login_flow.py' on 'MyApplication'", "tool_call": {"name": "ui_test_automation", "parameters": {"script_path": "login_flow.py", "target_app": "MyApplication"}}}
+        ]
+      },
+      {
+        "name": "game_bot_test",
+        "description": "Runs automated tests for games using bot simulation with a specified bot script.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "game_path": {
+              "type": "string",
+              "description": "The path to the game executable or project (e.g., 'C:\\Games\\MyGame.exe')."
+            },
+            "bot_script_path": {
+              "type": "string",
+              "description": "Path to the bot script for testing (e.g., 'bots/level_1_bot.py')."
+            }
+          },
+          "required": ["game_path", "bot_script_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Test 'SpaceInvaders.exe' with bot 'easy_mode_bot.py'", "tool_call": {"name": "game_bot_test", "parameters": {"game_path": "SpaceInvaders.exe", "bot_script_path": "easy_mode_bot.py"}}}
+        ]
+      },
+      {
+        "name": "generate_test_cases",
+        "description": "Generates AI-powered test cases for a given code or feature description.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "target_description": {
+              "type": "string",
+              "description": "Description of the code or feature to generate test cases for (e.g., 'login function', 'user registration flow')."
+            },
+            "language": {
+              "type": "string",
+              "description": "Optional: Programming language of the target (e.g., 'Python', 'Java'). Defaults to 'python'."
+            }
+          },
+          "required": ["target_description"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate test cases for the 'checkout' module in JavaScript", "tool_call": {"name": "generate_test_cases", "parameters": {"target_description": "checkout module", "language": "JavaScript"}}}
+        ]
+      },
+      {
+        "name": "model_eval_test",
+        "description": "Evaluates and tests AI/ML models for performance and bias using a specified dataset and optional metrics.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "model_path": {
+              "type": "string",
+              "description": "Path to the AI/ML model file (e.g., 'models/sentiment_model.pkl')."
+            },
+            "dataset_path": {
+              "type": "string",
+              "description": "Path to the dataset for evaluation (e.g., 'data/test_data.csv')."
+            },
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Optional: List of evaluation metrics (e.g., 'accuracy', 'precision', 'f1_score')."
+            }
+          },
+          "required": ["model_path", "dataset_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Evaluate 'fraud_detection_model.h5' with 'transactions.csv' for accuracy and recall", "tool_call": {"name": "model_eval_test", "parameters": {"model_path": "fraud_detection_model.h5", "dataset_path": "transactions.csv", "metrics": ["accuracy", "recall"]}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Deployment Tools",
+    "tools": [
+      {
+        "name": "deploy_app",
+        "description": "Deploys an application to a specified target (desktop, mobile, web). (Placeholder: requires platform-specific methods).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_path": {
+              "type": "string",
+              "description": "The path of the application package or source to deploy."
+            },
+            "target_type": {
+              "type": "string",
+              "enum": ["desktop", "mobile", "web"],
+              "description": "The type of target for deployment."
+            }
+          },
+          "required": ["app_path", "target_type"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Deploy 'my_desktop_app.exe' to desktop", "tool_call": {"name": "deploy_app", "parameters": {"app_path": "my_desktop_app.exe", "target_type": "desktop"}}}
+        ]
+      },
+      {
+        "name": "cloud_deploy",
+        "description": "Deploys an application to a specified cloud provider (AWS, Azure, GCP). (Placeholder: requires cloud SDKs).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_path": {
+              "type": "string",
+              "description": "The path of the application package or source to deploy."
+            },
+            "cloud_provider": {
+              "type": "string",
+              "enum": ["aws", "azure", "gcp"],
+              "description": "The cloud provider to deploy to."
+            },
+            "region": {
+              "type": "string",
+              "description": "Optional: The cloud region for deployment (e.g., 'us-east-1')."
+            }
+          },
+          "required": ["app_path", "cloud_provider"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Deploy 'my_web_service' to AWS in us-east-1", "tool_call": {"name": "cloud_deploy", "parameters": {"app_path": "my_web_service", "cloud_provider": "aws", "region": "us-east-1"}}}
+        ]
+      },
+      {
+        "name": "iot_deploy",
+        "description": "Deploys software to an IoT device. (Placeholder: requires IoT management protocols).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "software_path": {
+              "type": "string",
+              "description": "Path to the software package for deployment."
+            },
+            "device_id": {
+              "type": "string",
+              "description": "Identifier of the IoT device."
+            }
+          },
+          "required": ["software_path", "device_id"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Deploy 'firmware_update.bin' to IoT device 'sensor_001'", "tool_call": {"name": "iot_deploy", "parameters": {"software_path": "firmware_update.bin", "device_id": "sensor_001"}}}
+        ]
+      },
+      {
+        "name": "container_deploy",
+        "description": "Deploys a containerized application using Docker or Kubernetes.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "image_name": {
+              "type": "string",
+              "description": "Name of the Docker image to deploy (e.g., 'my_app:latest')."
+            },
+            "orchestrator": {
+              "type": "string",
+              "enum": ["docker", "kubernetes"],
+              "description": "The container orchestration platform to use."
+            },
+            "config_path": {
+              "type": "string",
+              "description": "Optional: Path to Kubernetes YAML or Docker Compose file (e.g., 'k8s/deployment.yaml')."
+            }
+          },
+          "required": ["image_name", "orchestrator"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Deploy 'nginx:latest' using Docker", "tool_call": {"name": "container_deploy", "parameters": {"image_name": "nginx:latest", "orchestrator": "docker"}}},
+          {"input": "Deploy 'my_service' to Kubernetes with 'k8s/deploy.yaml'", "tool_call": {"name": "container_deploy", "parameters": {"image_name": "my_service", "orchestrator": "kubernetes", "config_path": "k8s/deploy.yaml"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Security Tools",
+    "tools": [
+      {
+        "name": "static_code_scan",
+        "description": "Performs a static code analysis to find potential bugs and vulnerabilities.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "code_path": {
+              "type": "string",
+              "description": "Path to the code directory or file to scan (e.g., 'src/my_app', 'main.py')."
+            },
+            "language": {
+              "type": "string",
+              "description": "Optional: Programming language of the code (e.g., 'Python', 'Java'). Auto-detects if not provided."
+            }
+          },
+          "required": ["code_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Scan the 'backend' folder for security issues", "tool_call": {"name": "static_code_scan", "parameters": {"code_path": "backend", "language": "Python"}}}
+        ]
+      },
+      {
+        "name": "dependency_vulnerability_scan",
+        "description": "Scans project dependencies for known vulnerabilities.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "project_path": {
+              "type": "string",
+              "description": "Path to the project directory (e.g., containing package.json, requirements.txt)."
+            }
+          },
+          "required": ["project_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Scan dependencies in 'my_web_project'", "tool_call": {"name": "dependency_vulnerability_scan", "parameters": {"project_path": "my_web_project"}}}
+        ]
+      },
+      {
+        "name": "dynamic_security_test",
+        "description": "Performs dynamic application security testing (DAST) on a running application.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "target_url": {
+              "type": "string",
+              "description": "URL of the running application to test (e.g., 'https://myapp.com')."
+            },
+            "scan_profile": {
+              "type": "string",
+              "description": "Optional: Security scan profile (e.g., 'full', 'passive', 'api_only')."
+            }
+          },
+          "required": ["target_url"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Run a full security scan on 'https://mybank.com'", "tool_call": {"name": "dynamic_security_test", "parameters": {"target_url": "https://mybank.com", "scan_profile": "full"}}}
+        ]
+      },
+      {
+        "name": "container_security_scan",
+        "description": "Scans Docker images or running containers for security vulnerabilities.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "target_name": {
+              "type": "string",
+              "description": "Name of the Docker image or container ID to scan (e.g., 'nginx:latest', 'a1b2c3d4e5f6')."
+            },
+            "target_type": {
+              "type": "string",
+              "enum": ["image", "container"],
+              "description": "Type of target to scan ('image' or 'container')."
+            }
+          },
+          "required": ["target_name", "target_type"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Scan Docker image 'my_custom_image'", "tool_call": {"name": "container_security_scan", "parameters": {"target_name": "my_custom_image", "target_type": "image"}}}
+        ]
+      },
+      {
+        "name": "privacy_compliance_check",
+        "description": "Checks an application or data for compliance with privacy regulations (e.g., GDPR, CCPA).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "scope_description": {
+              "type": "string",
+              "description": "Description of the application or data scope to check (e.g., 'customer data processing', 'website analytics')."
+            },
+            "regulations": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of regulations to check against (e.g., ['GDPR', 'CCPA', 'HIPAA'])."
+            }
+          },
+          "required": ["scope_description", "regulations"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Check 'user data handling' for GDPR compliance", "tool_call": {"name": "privacy_compliance_check", "parameters": {"scope_description": "user data handling", "regulations": ["GDPR"]}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Data & AI Tools",
+    "tools": [
+      {
+        "name": "train_ml_model",
+        "description": "Trains a machine learning model with a given dataset and optional configuration.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "model_type": {
+              "type": "string",
+              "description": "Type of ML model to train (e.g., 'classification', 'regression', 'neural_network')."
+            },
+            "dataset_path": {
+              "type": "string",
+              "description": "Path to the training dataset (e.g., 'data/train.csv')."
+            },
+            "config_path": {
+              "type": "string",
+              "description": "Optional: Path to model configuration file (e.g., 'configs/model_config.json')."
+            }
+          },
+          "required": ["model_type", "dataset_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Train a classification model using 'iris.csv'", "tool_call": {"name": "train_ml_model", "parameters": {"model_type": "classification", "dataset_path": "iris.csv"}}}
+        ]
+      },
+      {
+        "name": "evaluate_ml_model",
+        "description": "Evaluates a trained machine learning model using a test dataset.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "model_path": {
+              "type": "string",
+              "description": "Path to the trained ML model (e.g., 'models/my_model.pkl')."
+            },
+            "test_dataset_path": {
+              "type": "string",
+              "description": "Path to the test dataset for evaluation (e.g., 'data/test.csv')."
+            }
+          },
+          "required": ["model_path", "test_dataset_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Evaluate 'sentiment_model.h5' with 'reviews_test.csv'", "tool_call": {"name": "evaluate_ml_model", "parameters": {"model_path": "sentiment_model.h5", "test_dataset_path": "reviews_test.csv"}}}
+        ]
+      },
+      {
+        "name": "optimize_ml_model",
+        "description": "Optimizes a machine learning model for performance or size.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "model_path": {
+              "type": "string",
+              "description": "Path to the ML model to optimize (e.g., 'models/large_model.pt')."
+            },
+            "optimization_goal": {
+              "type": "string",
+              "enum": ["performance", "size"],
+              "description": "The goal of the optimization ('performance' or 'size')."
+            }
+          },
+          "required": ["model_path", "optimization_goal"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Optimize 'image_recognition_model.onnx' for size", "tool_call": {"name": "optimize_ml_model", "parameters": {"model_path": "image_recognition_model.onnx", "optimization_goal": "size"}}}
+        ]
+      },
+      {
+        "name": "data_pipeline_run",
+        "description": "Runs a data pipeline with an optional configuration file.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pipeline_name": {
+              "type": "string",
+              "description": "The name of the data pipeline to run (e.g., 'etl_daily_sales')."
+            },
+            "config_path": {
+              "type": "string",
+              "description": "Optional: Path to pipeline configuration file (e.g., 'pipelines/sales_config.json')."
+            }
+          },
+          "required": ["pipeline_name"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Run the 'customer_onboarding' data pipeline", "tool_call": {"name": "data_pipeline_run", "parameters": {"pipeline_name": "customer_onboarding"}}}
+        ]
+      },
+      {
+        "name": "data_cleaning",
+        "description": "Performs data cleaning operations on a dataset using optional cleaning rules.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset_path": {
+              "type": "string",
+              "description": "Path to the dataset to clean (e.g., 'raw_data/dirty_data.csv')."
+            },
+            "cleaning_rules_path": {
+              "type": "string",
+              "description": "Optional: Path to a file defining cleaning rules (e.g., 'rules/clean_rules.json')."
+            }
+          },
+          "required": ["dataset_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Clean 'user_inputs.txt' with rules from 'input_rules.json'", "tool_call": {"name": "data_cleaning", "parameters": {"dataset_path": "user_inputs.txt", "cleaning_rules_path": "input_rules.json"}}}
+        ]
+      },
+      {
+        "name": "data_visualization",
+        "description": "Generates visualizations from a dataset, specifying chart type and save path.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "dataset_path": {
+              "type": "string",
+              "description": "Path to the dataset for visualization (e.g., 'metrics.csv')."
+            },
+            "chart_type": {
+              "type": "string",
+              "description": "Type of chart to generate (e.g., 'bar', 'line', 'scatter', 'pie')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated visualization (e.g., 'charts/sales_bar.png')."
+            }
+          },
+          "required": ["dataset_path", "chart_type", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Create a bar chart from 'monthly_sales.csv' and save it as 'sales_chart.png'", "tool_call": {"name": "data_visualization", "parameters": {"dataset_path": "monthly_sales.csv", "chart_type": "bar", "save_path": "sales_chart.png"}}}
+        ]
+      },
+      {
+        "name": "dataset_scraper",
+        "description": "Scrapes data from web sources to create a dataset in a specified format and saves it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source_urls": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of URLs to scrape data from (e.g., ['https://example.com/data1', 'https://example.com/data2'])."
+            },
+            "output_format": {
+              "type": "string",
+              "enum": ["csv", "json", "xml"],
+              "description": "Format for the output dataset ('csv', 'json', or 'xml')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the scraped dataset (e.g., 'scraped_data.csv')."
+            }
+          },
+          "required": ["source_urls", "output_format", "save_path"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Scrape data from 'https://news.example.com' and 'https://blog.example.com' into a JSON file named 'news_data.json'", "tool_call": {"name": "dataset_scraper", "parameters": {"source_urls": ["https://news.example.com", "https://blog.example.com"], "output_format": "json", "save_path": "news_data.json"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "OS & Device Control",
+    "tools": [
+      {
+        "name": "device_status_check",
+        "description": "Checks the status of a specified device. (Placeholder: requires device-specific APIs).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "device_id": {
+              "type": "string",
+              "description": "Identifier of the device to check (e.g., 'printer_01', 'network_adapter')."
+            }
+          },
+          "required": ["device_id"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Check status of 'webcam_front'", "tool_call": {"name": "device_status_check", "parameters": {"device_id": "webcam_front"}}}
+        ]
+      },
+      {
+        "name": "hardware_monitor",
+        "description": "Monitors hardware performance metrics (CPU, RAM, disk) for a specified duration or continuously. (Placeholder: requires libraries like psutil).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "metrics": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of hardware metrics to monitor (e.g., ['cpu', 'ram']). Defaults to 'all'."
+            },
+            "duration": {
+              "type": "integer",
+              "description": "Optional: Duration to monitor in seconds. Continuous if not provided."
+            }
+          },
+          "required": ["metrics"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Monitor CPU and RAM for 60 seconds", "tool_call": {"name": "hardware_monitor", "parameters": {"metrics": ["cpu", "ram"], "duration": 60}}},
+          {"input": "Monitor all hardware metrics continuously", "tool_call": {"name": "hardware_monitor", "parameters": {"metrics": ["all"]}}}
+        ]
+      },
+      {
+        "name": "virtual_device_control",
+        "description": "Controls virtual devices (e.g., starting/stopping VMs, emulators) by performing a specified action.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "device_name": {
+              "type": "string",
+              "description": "Name or ID of the virtual device (e.g., 'Android Emulator', 'Ubuntu VM')."
+            },
+            "action": {
+              "type": "string",
+              "enum": ["start", "stop", "restart", "pause"],
+              "description": "Action to perform on the virtual device ('start', 'stop', 'restart', or 'pause')."
+            }
+          },
+          "required": ["device_name", "action"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Start the 'Android Emulator'", "tool_call": {"name": "virtual_device_control", "parameters": {"device_name": "Android Emulator", "action": "start"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Documentation Tools",
+    "tools": [
+      {
+        "name": "generate_api_docs",
+        "description": "Generates API documentation from code or a specification file in a specified format and saves it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source_path": {
+              "type": "string",
+              "description": "Path to API code or specification file (e.g., 'src/api/main.py', 'swagger.yaml')."
+            },
+            "format": {
+              "type": "string",
+              "enum": ["html", "markdown", "json"],
+              "description": "Output format for the documentation ('html', 'markdown', or 'json')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated documentation (e.g., 'docs/api_docs.html')."
+            }
+          },
+          "required": ["source_path", "format", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate HTML API docs from 'api_spec.yaml' to 'output/api.html'", "tool_call": {"name": "generate_api_docs", "parameters": {"source_path": "api_spec.yaml", "format": "html", "save_path": "output/api.html"}}}
+        ]
+      },
+      {
+        "name": "generate_code_docs",
+        "description": "Generates code documentation from source files in a specified programming language and saves it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "code_path": {
+              "type": "string",
+              "description": "Path to the source code directory or file (e.g., 'src/utils', 'main.js')."
+            },
+            "language": {
+              "type": "string",
+              "description": "Programming language of the code (e.g., 'Python', 'JavaScript', 'Java')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated documentation (e.g., 'docs/code_docs.md')."
+            }
+          },
+          "required": ["code_path", "language", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate Python code docs for 'my_module.py' and save to 'docs/python_code.md'", "tool_call": {"name": "generate_code_docs", "parameters": {"code_path": "my_module.py", "language": "Python", "save_path": "docs/python_code.md"}}}
+        ]
+      },
+      {
+        "name": "generate_architecture_diagram",
+        "description": "Generates an architecture diagram from a textual description or code analysis in a specified format and saves it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Textual description of the architecture (e.g., 'A web application with a frontend, backend, and database')."
+            },
+            "format": {
+              "type": "string",
+              "enum": ["png", "svg", "drawio"],
+              "description": "Output format for the diagram ('png', 'svg', or 'drawio')."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated diagram (e.g., 'diagrams/app_arch.png')."
+            }
+          },
+          "required": ["description", "format", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Create a PNG architecture diagram for 'microservices architecture' and save to 'arch.png'", "tool_call": {"name": "generate_architecture_diagram", "parameters": {"description": "microservices architecture", "format": "png", "save_path": "arch.png"}}}
+        ]
+      },
+      {
+        "name": "generate_user_manual",
+        "description": "Generates a user manual for an application or system, detailing key features and saving it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_description": {
+              "type": "string",
+              "description": "Description of the application or system (e.g., 'A task management application')."
+            },
+            "features": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of key features to document (e.g., ['create task', 'assign task', 'set due date'])."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated manual (e.g., 'docs/user_manual.pdf')."
+            }
+          },
+          "required": ["app_description", "features", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate a user manual for 'Photo Editor Pro' with features 'crop, resize, filters' and save to 'manual.pdf'", "tool_call": {"name": "generate_user_manual", "parameters": {"app_description": "Photo Editor Pro", "features": ["crop", "resize", "filters"], "save_path": "manual.pdf"}}}
+        ]
+      },
+      {
+        "name": "generate_presentation",
+        "description": "Generates a presentation (e.g., slides) from a topic or outline and saves it.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "topic": {
+              "type": "string",
+              "description": "The main topic of the presentation (e.g., 'AI in Healthcare')."
+            },
+            "outline": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Optional: Key points or sections for the presentation (e.g., ['Introduction', 'Applications', 'Challenges'])"
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated presentation (e.g., 'presentations/AI_Healthcare.pptx')."
+            }
+          },
+          "required": ["topic", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Create a presentation on 'Future of Work' with outline 'Remote Work, Automation, AI' and save to 'future_work.pptx'", "tool_call": {"name": "generate_presentation", "parameters": {"topic": "Future of Work", "outline": ["Remote Work", "Automation", "AI"], "save_path": "future_work.pptx"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "CI/CD & Automation",
+    "tools": [
+      {
+        "name": "trigger_ci_pipeline",
+        "description": "Triggers a Continuous Integration (CI) pipeline for a specified pipeline name and optional branch.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pipeline_name": {
+              "type": "string",
+              "description": "Name or ID of the CI pipeline to trigger (e.g., 'build-main', 'deploy-prod')."
+            },
+            "branch": {
+              "type": "string",
+              "description": "Optional: Branch to build. Defaults to main/master (e.g., 'feature/new-login')."
+            }
+          },
+          "required": ["pipeline_name"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Trigger the 'backend-build' CI pipeline", "tool_call": {"name": "trigger_ci_pipeline", "parameters": {"pipeline_name": "backend-build"}}},
+          {"input": "Start CI pipeline 'frontend-deploy' for branch 'dev'", "tool_call": {"name": "trigger_ci_pipeline", "parameters": {"pipeline_name": "frontend-deploy", "branch": "dev"}}}
+        ]
+      },
+      {
+        "name": "monitor_ci_pipeline",
+        "description": "Monitors the status of a running CI pipeline using its ID.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pipeline_id": {
+              "type": "string",
+              "description": "ID of the CI pipeline run to monitor (e.g., 'build-12345')."
+            }
+          },
+          "required": ["pipeline_id"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Monitor CI pipeline 'build-9876'", "tool_call": {"name": "monitor_ci_pipeline", "parameters": {"pipeline_id": "build-9876"}}}
+        ]
+      },
+      {
+        "name": "abort_ci_pipeline",
+        "description": "Aborts a running Continuous Integration (CI) pipeline using its ID.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "pipeline_id": {
+              "type": "string",
+              "description": "ID of the CI pipeline run to abort (e.g., 'build-12345')."
+            }
+          },
+          "required": ["pipeline_id"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Abort CI pipeline 'deploy-54321'", "tool_call": {"name": "abort_ci_pipeline", "parameters": {"pipeline_id": "deploy-54321"}}}
+        ]
+      },
+      {
+        "name": "schedule_task",
+        "description": "Schedules a task at a specific time. (Placeholder: uses 'schedule' library).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "task": {
+              "type": "string",
+              "description": "The description of the task to schedule (e.g., 'Run daily report')."
+            },
+            "time": {
+              "type": "string",
+              "description": "The time to schedule the task (e.g., '10:30', '14:00')."
+            }
+          },
+          "required": ["task", "time"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Schedule 'backup_database' at 03:00", "tool_call": {"name": "schedule_task", "parameters": {"task": "backup_database", "time": "03:00"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Monitoring & Maintenance",
+    "tools": [
+      {
+        "name": "monitor_logs",
+        "description": "Monitors logs for a service or application, with optional keyword filtering. (Placeholder: requires log reading/service integration).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "service_name": {
+              "type": "string",
+              "description": "The name of the service or application to monitor logs for (e.g., 'web_server', 'database')."
+            },
+            "keywords": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Optional: Keywords to filter log entries (e.g., ['error', 'failed login'])."
+            }
+          },
+          "required": ["service_name"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Monitor 'auth_service' logs for 'failed login' errors", "tool_call": {"name": "monitor_logs", "parameters": {"service_name": "auth_service", "keywords": ["failed login"]}}}
+        ]
+      },
+      {
+        "name": "alert_on_error",
+        "description": "Sets up an alert for specific errors in logs or system metrics, sending notifications to a recipient. (Placeholder: requires alerting system integration).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "monitor_target": {
+              "type": "string",
+              "description": "Description of what to monitor (e.g., 'web server logs', 'CPU usage', 'database errors')."
+            },
+            "error_pattern": {
+              "type": "string",
+              "description": "Regex pattern or keyword to trigger the alert (e.g., '500 Internal Server Error', 'OutOfMemoryError')."
+            },
+            "alert_recipient": {
+              "type": "string",
+              "description": "Recipient for the alert (e.g., 'email:admin@example.com', 'slack:#alerts', 'phone:+1234567890')."
+            }
+          },
+          "required": ["monitor_target", "error_pattern", "alert_recipient"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Alert admin@example.com if 'critical error' appears in 'app_logs'", "tool_call": {"name": "alert_on_error", "parameters": {"monitor_target": "app_logs", "error_pattern": "critical error", "alert_recipient": "email:admin@example.com"}}}
+        ]
+      },
+      {
+        "name": "incident_report_generator",
+        "description": "Generates an incident report based on provided details, including description, impact, affected systems, and save path. (Placeholder: generates structured report).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "incident_description": {
+              "type": "string",
+              "description": "Detailed description of the incident."
+            },
+            "impact": {
+              "type": "string",
+              "enum": ["high", "medium", "low"],
+              "description": "Impact of the incident ('high', 'medium', or 'low')."
+            },
+            "affected_systems": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of systems affected by the incident (e.g., ['frontend', 'database', 'API gateway'])."
+            },
+            "save_path": {
+              "type": "string",
+              "description": "Path to save the generated report (e.g., 'reports/incident_20250811.pdf')."
+            }
+          },
+          "required": ["incident_description", "impact", "affected_systems", "save_path"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Generate incident report for 'database outage' with high impact on 'database' and 'backend' systems, save to 'db_incident.txt'", "tool_call": {"name": "incident_report_generator", "parameters": {"incident_description": "database outage", "impact": "high", "affected_systems": ["database", "backend"], "save_path": "db_incident.txt"}}}
+        ]
+      },
+      {
+        "name": "app_usage_analytics",
+        "description": "Retrieves and analyzes application usage data for a specified app, with optional date range. (Placeholder: requires analytics platform integration).",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_name": {
+              "type": "string",
+              "description": "Name of the application for analytics (e.g., 'Rexode CLI', 'MyWebApp')."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "Optional: Start date for data retrieval (YYYY-MM-DD)."
+            },
+            "end_date": {
+              "type": "string",
+              "description": "Optional: End date for data retrieval (YYYY-MM-DD)."
+            }
+          },
+          "required": ["app_name"]
+        },
+        "sensitive": false,
+        "examples": [
+          {"input": "Get usage analytics for 'Rexode CLI' for July 2025", "tool_call": {"name": "app_usage_analytics", "parameters": {"app_name": "Rexode CLI", "start_date": "2025-07-01", "end_date": "2025-07-31"}}}
+        ]
+      }
+    ]
+  },
+  {
+    "category": "Backup & Rollback",
+    "tools": [
+      {
+        "name": "create_backup",
+        "description": "Creates a backup of specified files, directories, or system state to a destination, with an optional backup type.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "source_paths": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of paths to files or directories to backup (e.g., ['/home/user/docs', 'C:\\data\\db.bak'])."
+            },
+            "backup_destination": {
+              "type": "string",
+              "description": "Destination path for the backup (local path or remote storage URL)."
+            },
+            "backup_type": {
+              "type": "string",
+              "enum": ["full", "incremental"],
+              "description": "Optional: Type of backup ('full' or 'incremental'). Defaults to 'full'."
+            }
+          },
+          "required": ["source_paths", "backup_destination"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Create a full backup of 'my_documents' to 'D:\\backups'", "tool_call": {"name": "create_backup", "parameters": {"source_paths": ["my_documents"], "backup_destination": "D:\\backups", "backup_type": "full"}}}
+        ]
+      },
+      {
+        "name": "rollback_deploy",
+        "description": "Rolls back a deployed application to a previous version or the last stable version.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "app_name": {
+              "type": "string",
+              "description": "Name of the application to rollback (e.g., 'WebAppV2')."
+            },
+            "version": {
+              "type": "string",
+              "description": "Optional: Specific version to rollback to (e.g., 'v1.0.0'). Rolls back to last stable if not provided."
+            }
+          },
+          "required": ["app_name"]
+        },
+        "sensitive": true,
+        "examples": [
+          {"input": "Rollback 'WebAppV2' to version 'v1.5'", "tool_call": {"name": "rollback_deploy", "parameters": {"app_name": "WebAppV2", "version": "v1.5"}}}
+        ]
       }
     ]
   }

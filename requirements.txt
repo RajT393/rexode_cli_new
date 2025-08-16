@@ -43,3 +43,4 @@ rich
 tqdm
 fuzzywuzzy
 python-Levenshtein # Required for fuzzywuzzy performance
+GitPython
