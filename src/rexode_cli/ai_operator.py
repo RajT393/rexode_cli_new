@@ -110,5 +110,5 @@ class AIOperator:
         5. Run & debug
         6. Report result
         """
-        steps = self.model.query(plan_prompt)
+        steps = (await self.model.ainvoke(plan_prompt)).content
         return f"Project plan ready:\n{steps}"
